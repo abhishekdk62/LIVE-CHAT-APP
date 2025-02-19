@@ -13,9 +13,10 @@ const useGetMessages = () => {
       setLoading(true);
       try {
         const res = await fetch(
-          `http://localhost:5000/api/messages/${selectedConversation._id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/messages/${selectedConversation._id}`,
           { credentials: "include" }
         );
+        
 
         if (!res.ok) {
           throw new Error("Failed to fetch messages");
