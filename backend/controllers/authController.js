@@ -1,11 +1,13 @@
 const User = require("../models/usermodel");
 const bcrypt = require("bcrypt");
-const genetateTokenAndsetCookie = require("../utils/generateToken");
+const jwt = require("jsonwebtoken"); // ✅ Added missing import
+const generateTokenAndSetCookie = require("../utils/generateToken"); // ✅ Corrected function name
+
 const signup = async (req, res) => {
   try {
     const { fullName, userName, password, confirmPassword, gender } = req.body;
     if (password !== confirmPassword) {
-      return res.status(400).json({ error: "Passwords do no match" });
+      return res.status(400).json({ error: "Passwords do not match" });
     }
     const user = await User.findOne({ userName });
     if (user) {
@@ -25,60 +27,64 @@ const signup = async (req, res) => {
     });
 
     await newUser.save();
-    genetateTokenAndsetCookie(newUser._id, res);
+    generateTokenAndSetCookie(newUser._id, res); // ✅ Fixed spelling
 
     res.status(201).json({ newUser });
   } catch (error) {
     console.log("Error in signup controller", error.message);
-
     res.status(500).json({ error: "Internal server Error" });
   }
 };
 const login = async (req, res) => {
+  try {
+    const { userName, password } = req.body;
 
-try {
-  const{userName,password}=req.body
-
-  const user= await User.findOne({userName})
-
-  if(user)
-  {
-    const isMatch=await bcrypt.compare(password,user.password)
-    if(isMatch)
-    {
-      genetateTokenAndsetCookie(user._id,res)
-      res.status(200).json("login successfull")
+    if (!userName || !password) {
+      return res.status(400).json("Please enter all the fields");
     }
-    else{
-      res.status(400).json("password mismatch")
+
+    const user = await User.findOne({ userName });
+
+    if (user) {
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (isMatch) {
+        // 🔥 Correct way to generate a unique JWT for each user
+        const token = jwt.sign({ userId: user._id.toString() }, "7dE33hdd", { expiresIn: "7d" });
+
+        // 🔥 Setting the correct cookie
+        res.cookie("jwt", token, {
+          httpOnly: true,
+          secure: true, // Remove this if running locally
+          sameSite: "Lax",
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
+
+        return res.status(200).json(user);
+      } else {
+        return res.status(400).json("Password mismatch");
+      }
+    } else {
+      return res.status(400).json("User not found");
     }
+  } catch (error) {
+    console.log({ message: error });
+    return res.status(500).json("Internal server error");
   }
-  else{
-    res.status(400).json("user not found")
-  }
-
-  
-} catch (error) {
-
-  res.status(400).json("Internal server error")
-  console.log({message:error});
-  
-  
-}
-
-
 };
+
+
 const logout = async (req, res) => {
-
-try {
-  res.cookie("jwt","",{
-    maxAge:0
-  })
-  res.status(200).json("loged out succesfully")
-} catch (error) {
-  res.status(500).json("internal server error ...")
-}
-
+  try {
+    res.cookie("jwt", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      expires: new Date(0), // ✅ More reliable than maxAge: 0
+    });
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json("Internal server error...");
+  }
 };
 
 module.exports = { signup, login, logout };

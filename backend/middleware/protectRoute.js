@@ -9,26 +9,23 @@ const protectedRoute = async (req, res, next) => {
     }
     const decoded = jwt.verify(token, "7dE33hdd");
 
+
     if (!decoded) {
       return res.status(400).json("Invalid Token");
     }
 
+    const user = await User.findById(decoded.userId).select("-password");
 
-const user = await User.findById(decoded.userId).select("-password");
+    if (!user) {
+      return res.status(400).json("user not found");
+    }
+    req.user = user;
 
-if(!user)
-{
-    return res.status(400).json("user not found");
-
-}
-req.user=user
-
-next()
-
+    next();
   } catch (error) {
     res.status(400).json("internal server error");
     console.log({ messege: error });
   }
 };
 
-module.exports=protectedRoute
+module.exports = protectedRoute;
