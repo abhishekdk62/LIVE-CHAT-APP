@@ -1,5 +1,5 @@
 const User = require("../models/usermodel");
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken"); // ✅ Added missing import
 const generateTokenAndSetCookie = require("../utils/generateToken"); // ✅ Corrected function name
 
