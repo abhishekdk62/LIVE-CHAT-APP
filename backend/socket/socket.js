@@ -7,7 +7,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000", // Change this to match your frontend URL
+    origin: "https://live-chat-app-prod.onrender.com/", // Change this to match your frontend URL
     methods: ["GET", "POST"], // Methods should be in an array
   },
 });
