@@ -9,7 +9,7 @@ const useLogin = () => {
     setLoading(true); // Set loading to true while making the request
   
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch("https://live-chat-app-prod.onrender.com/api/auth/login", {
         method: "POST", // Specify the request method
         headers: {
           "Content-Type": "application/json", // Set content type to JSON

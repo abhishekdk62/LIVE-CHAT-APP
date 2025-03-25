@@ -11,7 +11,7 @@ const useGetConversations = () => {
       setLoading(true);
       try {
         const res = await fetch(
-          "http://localhost:5000/api/users",
+          "https://live-chat-app-prod.onrender.com/api/users",
           { credentials: "include" } // ✅ Important for cookies
         );
 

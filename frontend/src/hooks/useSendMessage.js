@@ -13,7 +13,7 @@ const useSendMessage = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/messages/send/${selectedConversation._id}`,
+        `https://live-chat-app-prod.onrender.com/api/messages/send/${selectedConversation._id}`,
         {
           method: "POST",
           headers: {
