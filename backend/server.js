@@ -6,9 +6,10 @@ const messageRoutes = require("./routes/messageRoutes");
 const connectDB = require("./db/connectDB");
 const cookieParser = require("cookie-parser");
 const userRoutes = require("./routes/userRoutes");
-const {server,app}=require("./socket/socket")
-dotenv.config();
+const { server, app } = require("./socket/socket");
+const path = require("path");
 
+dotenv.config();
 
 // CORS configuration to allow requests from http://localhost:3000
 const corsOptions = {
@@ -24,9 +25,15 @@ app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
 
+app.use(express.static(path.join(__dirname, "../frontend/dist"))); // ✅ Correct path
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html")); // ✅ Correct path
+});
+
 const PORT = 5000;
 
 server.listen(PORT, () => {
   connectDB();
-  console.log(`server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
