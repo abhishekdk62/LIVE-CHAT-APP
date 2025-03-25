@@ -13,9 +13,9 @@ dotenv.config();
 
 // CORS configuration to allow requests from http://localhost:3000
 const corsOptions = {
-  origin: "http://localhost:3000", // Allow requests from this origin
-  methods: "GET,POST,PUT,DELETE",  // Allow specific methods (optional)
-  credentials: true,               // Allow cookies if needed
+  origin: ["http://localhost:3000", "https://live-chat-app-prod.onrender.com"], 
+  methods: "GET,POST,PUT,DELETE",  
+  credentials: true,               
 };
 
 app.use(cors(corsOptions)); // Use CORS middleware with options
